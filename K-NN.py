@@ -36,7 +36,7 @@ class KNN:
             {"Cielo":"Lluvia", "Temperatura":"Suave", "Humedad":"Alta"  , "Viento":"Fuerte" ,"JugarTenis":'-'}
         ]
     k = 1
-    target_attribute = None # TODO - Sentido de que sea none?
+    target_attribute = None # TODO - Sentido de que sea none? era para inicializarlo en algo
 	
     def __init__(self,ejemplos=None,k =None,t_attribute=None):
         '''
@@ -64,7 +64,7 @@ class KNN:
 		# devuelvo el promedio de los k vecinos 
 		salida = 0
 		for vecino in k_cercanos:
-			salida = vecino[target_attribute] + salida # TODO "+= vecino[SELF.target_attribute]"?
+			salida += vecino[SELF.target_attribute]
 		
 		return int(salida/self.k)
 

@@ -64,49 +64,50 @@ class NB:
             for atributo, valor in example.items():
                 self.values[atributo].add(valor)
 		
-		def calcular_probabilidades(): # TODO Bien identado? Que sentido tiene tenerlo aca?
-		# Calcula las probabilidades necesarias para aplicar NB
-		# P(salidad_i) -> probabilidad de cada valor del target_attribute
-		# P(a_i|salida_i) -> probabilidad de que ocurra a_i condicionada a salida_i
+		self.calcular_probabilidades()
+	
+	
+	def calcular_probabilidades(): 
+	# Calcula las probabilidades necesarias para aplicar NB
+	# P(salidad_i) -> probabilidad de cada valor del target_attribute
+	# P(a_i|salida_i) -> probabilidad de que ocurra a_i condicionada a salida_i
 		
-			# cantidad de ejemplos en el conjunto de datos de entrad
-			cant_examples =0 # TODO Usar len()?
+		# cantidad de ejemplos en el conjunto de datos de entrad
+		cant_examples = len(self.examples)
 			
-			#cantidad de ejemplos para cada valor posible del target_attribute
-			#es un diccionario {salida: cant}
-			cant_examples_por_salida = defaultdict(set)			
+		#cantidad de ejemplos para cada valor posible del target_attribute
+		#es un diccionario {salida: cant}
+		cant_examples_por_salida = defaultdict(set)			
 			
-			# diccionario donde key es una tupla (atributo_i, a_i,salida_i) y value es la cantidad de examples donde 
-			# el valor del atributo i vale a_i y el valor del target_attribute vale salida_i
-			cant_condicionadas =defaultdict(set)
+		# diccionario donde key es una tupla (atributo_i, a_i,salida_i) y value es la cantidad de examples donde 
+		# el valor del atributo i vale a_i y el valor del target_attribute vale salida_i
+		cant_condicionadas =defaultdict(set)
 			
-			# inicializacion de cant_condicionadas con todos los values en 0			
-			for atributo in self.values.keys():
-				if atributo != self.target_attribute :
-					for valor in self.values[atributo]:
-						for  salida in self.values[self.target_attribute]:
-							cant_condicionadas[(atributo,valor,salida)] = 0
+		# inicializacion de cant_condicionadas con todos los values en 0			
+		for atributo in self.values.keys():
+			if atributo != self.target_attribute :
+				for valor in self.values[atributo]:
+					for  salida in self.values[self.target_attribute]:
+						cant_condicionadas[(atributo,valor,salida)] = 0
 			
-			for example in self.examples:
-				salida = example[self.target_attribute]
-				cant_examples = cant_examples +1
-				cant_examples_por_salida[salida]= cant_examples_por_salida[salida] + 1 # TODO "+= 1"?
-				for atributo, valor in example.items(): 
-					cant_condicionadas[(atributo,valor,salida)] = cant_condicionadas[(atributo,valor,salida)] + 1 # TODO "+= 1"?
+		for example in self.examples:
+			salida = example[self.target_attribute]			
+			cant_examples_por_salida[salida]+= 1
+			for atributo, valor in example.items(): 
+				cant_condicionadas[(atributo,valor,salida)] = += 1
 			
-			#Calcula P(salidad_i)
-			for salida in self.values[self.target_attribute]:
-				prob_salida[salida] = cant_examples_por_salida[salida] / cant_examples
+		#Calcula P(salidad_i)
+		for salida in self.values[self.target_attribute]:
+			prob_salida[salida] = cant_examples_por_salida[salida] / cant_examples
 			
-			# Calcula P(a_i|salida_i)
-			for atributo in self.values.keys():
-				if atributo != self.target_attribute :
-					p = 1/ self.values[atributo].size
-					for valor in self.values[atributo]:
-						for  salida in self.values[self.target_attribute]:
-							# aplica estimacion de probabilidades, suponiendo una predisposicion equitativa entre los valores de un atributo
-							prob_condicionadas[(atributo,valor,salida)] = (cant_condicionadas[(atributo,valor,salida)] + (self.eq_ss * p ))/ (cant_examples_por_salida[salida] + self.eq_ss)
-			
+		# Calcula P(a_i|salida_i)
+		for atributo in self.values.keys():
+			if atributo != self.target_attribute :
+				p = 1/ self.values[atributo].size
+				for valor in self.values[atributo]:
+					for  salida in self.values[self.target_attribute]:
+						# aplica estimacion de probabilidades, suponiendo una predisposicion equitativa entre los valores de un atributo
+						prob_condicionadas[(atributo,valor,salida)] = (cant_condicionadas[(atributo,valor,salida)] + (self.eq_ss * p ))/ (cant_examples_por_salida[salida] + self.eq_ss)
 	
 	def clasificar(elemento):
 	# retorna el valor estimado para el target_attribute
