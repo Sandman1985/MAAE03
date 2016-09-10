@@ -21,15 +21,32 @@ from collections import defaultdict
 
 
 class NB:
-	values    = defaultdict(set)
-	examples  = None
-	eq_ss	  = 0
-	target_attribute = None
-	# diccionario donde key es una tupla (atributo_i,a_i,salida_i) y value es P(a_i|salida_i) 
-	prob_condicionadas = defaultdict(set)
-	# diccionario donde key  es salida_i  y value es P(salida_i)
-	prob_salida = defaultdict(set)
-	
+    # Dataset - Proposito de test. Tomado del libro.
+    examples = [
+            {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'},
+            {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Fuerte" ,"JugarTenis":'-'},
+            {"Cielo":"Nubes" , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'+'},
+            {"Cielo":"Lluvia", "Temperatura":"Suave", "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'+'},
+            {"Cielo":"Lluvia", "Temperatura":"Baja" , "Humedad":"Normal", "Viento":"Debil"  ,"JugarTenis":'+'},
+            {"Cielo":"Lluvia", "Temperatura":"Baja" , "Humedad":"Normal", "Viento":"Fuerte" ,"JugarTenis":'-'},
+            {"Cielo":"Nubes" , "Temperatura":"Baja" , "Humedad":"Normal", "Viento":"Fuerte" ,"JugarTenis":'+'},
+            {"Cielo":"Sol"   , "Temperatura":"Suave", "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'},
+            {"Cielo":"Sol"   , "Temperatura":"Baja" , "Humedad":"Normal", "Viento":"Debil"  ,"JugarTenis":'+'},
+            {"Cielo":"Lluvia", "Temperatura":"Suave", "Humedad":"Normal", "Viento":"Debil"  ,"JugarTenis":'+'},
+            {"Cielo":"Sol"   , "Temperatura":"Suave", "Humedad":"Normal", "Viento":"Fuerte" ,"JugarTenis":'+'},
+            {"Cielo":"Nubes" , "Temperatura":"Suave", "Humedad":"Alta"  , "Viento":"Fuerte" ,"JugarTenis":'+'},
+            {"Cielo":"Nubes" , "Temperatura":"Alta" , "Humedad":"Normal", "Viento":"Debil"  ,"JugarTenis":'+'},
+            {"Cielo":"Lluvia", "Temperatura":"Suave", "Humedad":"Alta"  , "Viento":"Fuerte" ,"JugarTenis":'-'}
+        ]
+    values    = defaultdict(set)
+    examples  = None
+    eq_ss	  = 0
+    target_attribute = None
+    # diccionario donde key es una tupla (atributo_i,a_i,salida_i) y value es P(a_i|salida_i) 
+    prob_condicionadas = defaultdict(set)
+    # diccionario donde key  es salida_i  y value es P(salida_i)
+    prob_salida = defaultdict(set)
+    
     def __init__(self,ejemplos=None,m =None,t_attribute=None):
         '''
         Instancia la clase, indicando opcionalmente un dataset de ejemplos  
@@ -40,20 +57,20 @@ class NB:
         # Si se especifico m se setea como  equivalent sample size
         if m: self.eq_ss = m
         
-		if t_attribute : target_attribute = t_attribute
+        if t_attribute : target_attribute = t_attribute
 		
         # Extraer los valores de atributos para cada dato
         for example in self.examples:
             for atributo, valor in example.items():
                 self.values[atributo].add(valor)
 		
-		def calcular_probabilidades():
+		def calcular_probabilidades(): # TODO Bien identado? Que sentido tiene tenerlo aca?
 		# Calcula las probabilidades necesarias para aplicar NB
 		# P(salidad_i) -> probabilidad de cada valor del target_attribute
 		# P(a_i|salida_i) -> probabilidad de que ocurra a_i condicionada a salida_i
 		
 			# cantidad de ejemplos en el conjunto de datos de entrad
-			cant_examples =0
+			cant_examples =0 # TODO Usar len()?
 			
 			#cantidad de ejemplos para cada valor posible del target_attribute
 			#es un diccionario {salida: cant}
@@ -73,9 +90,9 @@ class NB:
 			for example in self.examples:
 				salida = example[self.target_attribute]
 				cant_examples = cant_examples +1
-				cant_examples_por_salida[salida]= cant_examples_por_salida[salida] + 1
+				cant_examples_por_salida[salida]= cant_examples_por_salida[salida] + 1 # TODO "+= 1"?
 				for atributo, valor in example.items(): 
-					cant_condicionadas[(atributo,valor,salida)] = cant_condicionadas[(atributo,valor,salida)] + 1
+					cant_condicionadas[(atributo,valor,salida)] = cant_condicionadas[(atributo,valor,salida)] + 1 # TODO "+= 1"?
 			
 			#Calcula P(salidad_i)
 			for salida in self.values[self.target_attribute]:

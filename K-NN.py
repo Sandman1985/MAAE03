@@ -16,13 +16,27 @@ Practico 3, Ejercicio 7
     ejemplos  : [{a1:v1,...,aN:vN}], donde a:Atributo y v:Valor  
 '''
 
-
-class K-NN:
-
-	examples  = None
-	k = 1
-	target_attribute = None
-
+class KNN:
+    
+    # Dataset - Proposito de test. Tomado del libro.
+    examples = [
+            {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'},
+            {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Fuerte" ,"JugarTenis":'-'},
+            {"Cielo":"Nubes" , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'+'},
+            {"Cielo":"Lluvia", "Temperatura":"Suave", "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'+'},
+            {"Cielo":"Lluvia", "Temperatura":"Baja" , "Humedad":"Normal", "Viento":"Debil"  ,"JugarTenis":'+'},
+            {"Cielo":"Lluvia", "Temperatura":"Baja" , "Humedad":"Normal", "Viento":"Fuerte" ,"JugarTenis":'-'},
+            {"Cielo":"Nubes" , "Temperatura":"Baja" , "Humedad":"Normal", "Viento":"Fuerte" ,"JugarTenis":'+'},
+            {"Cielo":"Sol"   , "Temperatura":"Suave", "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'},
+            {"Cielo":"Sol"   , "Temperatura":"Baja" , "Humedad":"Normal", "Viento":"Debil"  ,"JugarTenis":'+'},
+            {"Cielo":"Lluvia", "Temperatura":"Suave", "Humedad":"Normal", "Viento":"Debil"  ,"JugarTenis":'+'},
+            {"Cielo":"Sol"   , "Temperatura":"Suave", "Humedad":"Normal", "Viento":"Fuerte" ,"JugarTenis":'+'},
+            {"Cielo":"Nubes" , "Temperatura":"Suave", "Humedad":"Alta"  , "Viento":"Fuerte" ,"JugarTenis":'+'},
+            {"Cielo":"Nubes" , "Temperatura":"Alta" , "Humedad":"Normal", "Viento":"Debil"  ,"JugarTenis":'+'},
+            {"Cielo":"Lluvia", "Temperatura":"Suave", "Humedad":"Alta"  , "Viento":"Fuerte" ,"JugarTenis":'-'}
+        ]
+    k = 1
+    target_attribute = None # TODO - Sentido de que sea none?
 	
     def __init__(self,ejemplos=None,k =None,t_attribute=None):
         '''
@@ -34,14 +48,13 @@ class K-NN:
         # Si se especifico k se setea como  cantidad de vecinos a considerar
         if k: self.k= k
         
-		if t_attribute : target_attribute = t_attribute
+        if t_attribute : target_attribute = t_attribute
 		
 	def calcular_distancia(example1 , example2):
 	# calcula distancia euclidea
    
-       # Debe ser recontra choto, pero no encuentro una forma linda de hacerlo
-	
-	return
+        # Debe ser recontra choto, pero no encuentro una forma linda de hacerlo
+	    pass
 	
 	def clasificar(elemento):
 		ordenado = sorted(self.examples, key=lambda example : calcualar_distancia(elemento,example))
@@ -51,7 +64,7 @@ class K-NN:
 		# devuelvo el promedio de los k vecinos 
 		salida = 0
 		for vecino in k_cercanos:
-			salida = vecino[target_attribute] + salida
+			salida = vecino[target_attribute] + salida # TODO "+= vecino[SELF.target_attribute]"?
 		
 		return int(salida/self.k)
 
