@@ -14,13 +14,15 @@ Practico 2, Ejercicio 6
        a fin de obtener el arbol de desicion
 '''
 
-from DT import DT
-from NB import NB
+from DT  import DT
+from NB  import NB
 from KNN import KNN
 
-from csv import DictReader
+from csv    import DictReader
 from random import shuffle
-from copy import deepcopy
+from copy   import deepcopy
+from os     import remove
+from os.path import exists
 
 def data(csv_file,boolean,without):
     # Obtiene los ejemplos a partir de un archivo *.csv
@@ -82,7 +84,7 @@ def process(D,tA,parm,slice=0.2):
     
     test_size = int(round(len(D)*slice))
     test_sample, train_sample = D[:test_size], D[test_size:]
-    print "\n[DATOS] Total =",len(D),", Test =",len(test_sample),", Train =",len(train_sample)
+    print "[DATOS] Total =",len(D),", Test =",len(test_sample),", Train =",len(train_sample)
     
     delta_estimated, variance = cross_validation(train_sample,tA,parm)
     delta_real                = delta(train_sample,test_sample,tA,parm)
@@ -112,17 +114,18 @@ parms = {
         "parm1name":"M",
         "KFold":10
     },
-    "KNN":{
-        "inst":KNN,
-        "parm1":[1,2,3], # k neighbors
-        "parm1name":"K",
-        "KFold":None # Usa LOO CV
-    }
+#     "KNN":{
+#         "inst":KNN,
+#         "parm1":[1,2,3], # k neighbors
+#         "parm1name":"K",
+#         "KFold":None # Usa LOO CV
+#     }
 }
 
 boolean_set = ["ORIG","BOOL"]
 without_set = ["CON","SIN"]
- 
+
+remove('Summarize.txt') if exists('Summarize.txt') else None
 for name,path in datasets.items():
     for boolean in boolean_set:
         for without in without_set:
@@ -138,21 +141,21 @@ for name,path in datasets.items():
                         without, 
                         "%s%s" % (parm["parm1name"],str(parm['parm1'][0]))
                     )
-                    print tcase
+                    print "\n",tcase
                     
                     # Cargar el dataset
                     dataset = data(path,boolean=="BOOL",without=="SIN")
                     
                     try: # Procesar el caso, si ocurre un error se imprime
                         d_est, var, d_real = process(dataset,tA,parm)
-                        res = "\nDELTA_ESTIMADO: %f VARIANZA: %5.3f DELTA_REAL: %f" % (d_est,var,d_real)
+                        res = "DELTA_ESTIMADO: %f\nVARIANZA: %5.3f\nDELTA_REAL: %f" % (d_est,var,d_real)
                     except Exception as error:
                         res = str(error)
-                    print res,"\n"
+                    print "\n",res
                     
                     # Imprimir resultado
                     with open('Summarize.txt','a+') as f:
-                        f.write('\n'.join([tcase , res.replace(" ","\n")]))
+                        f.write('\n'.join(["\n\n*** %s ***" % tcase , res]))
                            
                     _parm.append(parm['parm1'].pop(0))
                     
