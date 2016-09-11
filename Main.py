@@ -20,7 +20,6 @@ from KNN import KNN
 
 from csv import DictReader
 from random import shuffle
-import os
 from copy import deepcopy
 
 def data(csv_file,boolean,without):
@@ -98,65 +97,64 @@ datasets = {
     "MAT":"Dataset/student-mat.csv",
     "POR":"Dataset/student-por.csv"
 }
+# cases = {"TEST":"Dataset/student-test.csv"}
 
 parms = {
 #     "DT":{
 #         "inst":DT,
 #         "parm1":[5,10,None], # max depth
-#         "parm1name":"depth",
+#         "parm1name":"DEPTH",
 #         "KFold":10
 #     },
     "NB":{
         "inst":NB,
         "parm1":[0,0.5,1], # equivalent sample data
-        "parm1name":"m",
+        "parm1name":"M",
         "KFold":10
     },
     "KNN":{
         "inst":KNN,
         "parm1":[1,2,3], # k neighbors
-        "parm1name":"k",
+        "parm1name":"K",
         "KFold":None # Usa LOO CV
     }
 }
 
-# cases = {"TEST":"Dataset/student-test.csv"}
 boolean_set = ["ORIG","BOOL"]
 without_set = ["CON","SIN"]
  
-texts = []
 for name,path in datasets.items():
     for boolean in boolean_set:
         for without in without_set:
-            for case,_parm in parms.items():
-                parm = deepcopy(_parm)
+            for case,parm in parms.items():
+                _parm = []
                 while parm['parm1']: # Prueba cada caso
                     
-                    tcase = "%s %s %s %s G1&G2 with %s" % (name, case, boolean, without, "%s%s" % (parm["parm1name"],str(parm['parm1'][0])))
+                    # Descirbir caso
+                    tcase = "%s %s %s %s G1&G2 with %s" % (
+                        name, 
+                        case, 
+                        boolean, 
+                        without, 
+                        "%s%s" % (parm["parm1name"],str(parm['parm1'][0]))
+                    )
                     print tcase
                     
+                    # Cargar el dataset
                     dataset = data(path,boolean=="BOOL",without=="SIN")
                     
-                    try:
+                    try: # Procesar el caso, si ocurre un error se imprime
                         d_est, var, d_real = process(dataset,tA,parm)
                         res = "\nDELTA_ESTIMADO: %f VARIANZA: %5.3f DELTA_REAL: %f" % (d_est,var,d_real)
                     except Exception as error:
                         res = str(error)
-                        
-                    texts += [tcase , res.replace(" ","\n")]
                     print res,"\n"
-                        
-#                     path_res = ''.join(["./Resultados/",'_'.join(tcase.split(' ')),".txt"])
-#                     if not os.path.isdir('./Resultados/'): os.mkdir(os.path.dirname('./Resultados/'))
-#                     print "Copiadondo resultado completo en ",path_res, "..."
-#                     with open(path_res,'w') as f: 
-#                         tcase = ' '.join(["*",tcase,"*"])
-#                         f.write('\n'.join([tcase , res.replace(" ","\n"),'\n']))
-#                         f.write(parm["inst"](tA,ejemplos=dataset,parm1=parm['parm1'][0]).__str__())
                     
-                    del parm['parm1'][0]
-                        
+                    # Imprimir resultado
+                    with open('Summarize.txt','a+') as f:
+                        f.write('\n'.join([tcase , res.replace(" ","\n")]))
+                           
+                    _parm.append(parm['parm1'].pop(0))
                     
-with open('Summarize.txt','w') as f:
-    f.write('\n'.join(texts))
-print "Fin" 
+                parm['parm1'] = _parm        
+              
