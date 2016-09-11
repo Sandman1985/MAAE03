@@ -43,7 +43,7 @@ class KNN:
     tA      = None
     
     # Exlcusivos
-    K       = 1
+    K = 1
 	
     
     def __init__(self,tA,ejemplos=None,K=None):
@@ -58,7 +58,7 @@ class KNN:
         
         # Extraer los valores de atributos para cada dato
         for example in self.examples:
-            for atributo, valor in example.items():
+            for atributo,valor in example.items():
                 self.values[atributo].add(valor)
 	
     	
@@ -85,7 +85,8 @@ class KNN:
         return sqrt(sum((x-y)**2 for v1,v2 in zip(e1,e2) for x,y in zip(v1,v2)))
 	
     
-    def classify(self,new_exaple):        
+    def classify(self,new_exaple):
+        # Devuelve la categoria para el nuevo ejemplo        
         # Obtener los k vecinos mas cercanos
     	ordenados = sorted(self.examples, key=lambda example : self.distance(new_exaple,example))
     	kvecinos = ordenados[:self.K]
@@ -106,7 +107,7 @@ class KNN:
     
     
     def predicts(self,example):
-        # Obtener el resultado real
+        # 1 si predice ok, 0 sino
         valor = example[self.tA]
         res = self.classify(example)
         return 1 if valor == res else 0
@@ -122,9 +123,9 @@ print inst.distance(
 )
 
 print inst.classify(
-    {"Cielo":"Nubes" , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'+'}
+    {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
 )
 
 print inst.predicts(
-    {"Cielo":"Nubes" , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
+    {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
 )

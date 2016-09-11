@@ -67,7 +67,7 @@ class DT:
         
         # Extraer los valores de atributos para cada dato
         for example in self.examples:
-            for atributo, valor in example.items():
+            for atributo,valor in example.items():
                 self.values[atributo].add(valor)
         
         Atts = [A for A in self.examples[0].keys() if A != tA]
@@ -127,11 +127,12 @@ class DT:
     
     
     def classify(self,new_example):
+        # Devuelve la categoria para el nuevo ejemplo
         return self.tree.classify(new_example,self.tA)
     
         
     def predicts(self,example):
-        # Obtener el resultado real
+        # 1 si predice ok, 0 sino
         valor = example[self.tA]
         res = self.classify(example)
         return 1 if valor == res else 0
