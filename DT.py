@@ -55,12 +55,12 @@ class DT:
     max_depht  = float('inf')
 	
     
-    def __init__(self,tA,ejemplos=None,max_prof=None):
+    def __init__(self,tA,ejemplos=None,parm1=None):
         # Si dan ejemplos nuevos, instanciarlos
         if ejemplos: self.examples = ejemplos
         
         # Dar limite de profundidad para poda
-        if max_prof: self.max_depht = max_prof
+        if parm1: self.max_depht = parm1
         
         # Guardar el atributo objetivo
         self.tA = tA
@@ -136,6 +136,9 @@ class DT:
         valor = example[self.tA]
         res = self.classify(example)
         return 1 if valor == res else 0
+    
+    def __str__(self):
+        return self.tree.__str__()
 
 class Nodo:
 # Mantiene la estructura del arbol de decision
@@ -193,13 +196,13 @@ class Nodo:
 
 
 # Test
-tA = "JugarTenis"
-inst = DT(tA)
-
-print inst.classify(
-    {"Cielo":"Nubes" , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'+'}
-)
-
-print inst.predicts(
-    {"Cielo":"Nubes" , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'+'}
-)
+# tA = "JugarTenis"
+# inst = DT(tA,parm1=5)
+# 
+# print inst.classify(
+#     {"Cielo":"Nubes" , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'+'}
+# )
+# 
+# print inst.predicts(
+#     {"Cielo":"Nubes" , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'+'}
+# )

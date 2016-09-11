@@ -46,12 +46,12 @@ class KNN:
     K = 1
 	
     
-    def __init__(self,tA,ejemplos=None,K=None):
+    def __init__(self,tA,ejemplos=None,parm1=None):
         # Si dan ejemplos nuevos, instanciarlos
         if ejemplos: self.examples = ejemplos
         
         # Si se especifico k se setea como  cantidad de vecinos a considerar
-        if K: self.K = K
+        if parm1: self.K = parm1
         
         # Guardar el atributo objetivo
         self.tA = tA
@@ -111,21 +111,26 @@ class KNN:
         valor = example[self.tA]
         res = self.classify(example)
         return 1 if valor == res else 0
+    
+    
+    def __str__(self):
+        return ""
+    
 
 # TODO - Duda: Se deberia incluir el target att en el calculo? De momento se considera, pero para mi no esta bien
 # Test
-tA = "JugarTenis"
-inst = KNN(tA,K=3)
-
-print inst.distance(
-    {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}, 
-    {"Cielo":"Sol"   , "Temperatura":"Baja" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
-)
-
-print inst.classify(
-    {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
-)
-
-print inst.predicts(
-    {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
-)
+# tA = "JugarTenis"
+# inst = KNN(tA,parm1=3)
+# 
+# print inst.distance(
+#     {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}, 
+#     {"Cielo":"Sol"   , "Temperatura":"Baja" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
+# )
+# 
+# print inst.classify(
+#     {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
+# )
+# 
+# print inst.predicts(
+#     {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
+# )

@@ -49,12 +49,12 @@ class NB:
     Pav = defaultdict(lambda:defaultdict(lambda:[])) # Matriz P(a_i|v_j)
     
     
-    def __init__(self,tA,ejemplos=None,m=None):
+    def __init__(self,tA,ejemplos=None,parm1=None):
         # Si dan ejemplos nuevos, instanciarlos
         if ejemplos: self.examples = ejemplos
         
         # Si se especifico m se setea como "equivalent sample size"
-        if m: self.m = m
+        if parm1: self.m = parm1
         
         # Guardar el atributo objetivo
         self.tA = tA
@@ -82,6 +82,7 @@ class NB:
                 for valor in self.values[atributo]:
                     for tAval in self.values[self.tA]:
                         # aplica estimacion de probabilidades, suponiendo una predisposicion equitativa entre los valores de un atributo
+                        if (ctA[tAval] + self.m) == 0: raise Exception("%s has no value %s" % (self.tA,str(tAval)))
                         self.Pav[tAval][valor] = 1.0 * (cCond[(atributo,valor,tAval)] + (self.m * p)) / (ctA[tAval] + self.m)    
         
 #         print "Pv",len(self.Pv),self.Pv
@@ -165,15 +166,20 @@ class NB:
         res = self.classify(new_example)
         return 1 if valor == res else 0
 
+    
+    def __str__(self):
+        return ""
+    
+
 # Test
-tA = "JugarTenis"
-inst = NB(tA,m=0)
-
-print inst.classify(
-    {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
-)
-
-print inst.predicts(
-    {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
-)
+# tA = "JugarTenis"
+# inst = NB(tA,parm1=0)
+# 
+# print inst.classify(
+#     {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
+# )
+# 
+# print inst.predicts(
+#     {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
+# )
 		
