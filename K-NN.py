@@ -10,7 +10,7 @@ Practico 3, Ejercicio 7
     Salvia, Damian        4.452.120-0
     
 @summary: 
-   Modela el algoritmo Naive Bayes.
+   Modela el algoritmo K Nearest Neighbors.
 
 @attention: 
     ejemplos  : [{a1:v1,...,aN:vN}], donde a:Atributo y v:Valor  
@@ -22,8 +22,8 @@ from itertools import groupby
 
 class KNN:
     
-    # Dataset - Proposito de test. Tomado del libro.
-    examples = [
+    # Comunes
+    examples = [ # Proposito de test. Tomado del libro.
             {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'},
             {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Fuerte" ,"JugarTenis":'-'},
             {"Cielo":"Nubes" , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'+'},
@@ -39,29 +39,30 @@ class KNN:
             {"Cielo":"Nubes" , "Temperatura":"Alta" , "Humedad":"Normal", "Viento":"Debil"  ,"JugarTenis":'+'},
             {"Cielo":"Lluvia", "Temperatura":"Suave", "Humedad":"Alta"  , "Viento":"Fuerte" ,"JugarTenis":'-'}
         ]
-    values = defaultdict(set)
-    k = 1
-    target_attribute = None # TODO - Sentido de que sea none? era para inicializarlo en algo. OK entonces en el init no va en None
+    values  = defaultdict(set)
+    tA      = None
+    
+    # Exlcusivos
+    K       = 1
 	
     
-    def __init__(self,tA,ejemplos=None,k=None):
-        '''
-        Instancia la clase, indicando opcionalmente un dataset de ejemplos  
-        '''
+    def __init__(self,tA,ejemplos=None,K=None):
         # Si dan ejemplos nuevos, instanciarlos
         if ejemplos: self.examples = ejemplos
         
         # Si se especifico k se setea como  cantidad de vecinos a considerar
-        if k: self.k = k
+        if K: self.K = K
         
-        if tA : self.target_attribute = tA
+        # Guardar el atributo objetivo
+        self.tA = tA
         
         # Extraer los valores de atributos para cada dato
         for example in self.examples:
             for atributo, valor in example.items():
                 self.values[atributo].add(valor)
-		
-    def calcular_distancia(self,example1,example2):
+	
+    	
+    def distance(self,example1,example2):
 
         def one_hot_encoding(att,val):
             # Para una pareja (att,val) crea un vector según los valores de los ejemplos
@@ -83,9 +84,11 @@ class KNN:
         # Para cada codificación (e_i) calcular la distancia entre ellos para obtener la distancia total
         return sqrt(sum((x-y)**2 for v1,v2 in zip(e1,e2) for x,y in zip(v1,v2)))
 	
-    def clasificar(self,elemento):
-    	ordenados = sorted(self.examples, key=lambda example : self.calcular_distancia(elemento,example))
-    	kvecinos = ordenados[:self.k]
+    
+    def classify(self,new_exaple):        
+        # Obtener los k vecinos mas cercanos
+    	ordenados = sorted(self.examples, key=lambda example : self.distance(new_exaple,example))
+    	kvecinos = ordenados[:self.K]
     	#esta parte es una opcion diseño, no se si sera lo correcto
     	# aunque es discreto el target_attribute para aproximar mejor la solucion aplico como si fuera una solucion real
     	# devuelvo el promedio de los k vecinos 
@@ -96,20 +99,32 @@ class KNN:
 #         return int(salida/self.k)
         
         # Agrupar por clases segun el atributo objetivo
-        agrupados = groupby(kvecinos, key=lambda s : s[self.target_attribute])
+        agrupados = groupby(kvecinos, key=lambda s : s[self.tA])
         
         # Devolver el valor cuya clase sea mayoritaria en los k vecinos
         return max(agrupados, key=lambda x:len(list(x[1])))[0]
-        
+    
+    
+    def predicts(self,example):
+        # Obtener el resultado real
+        valor = example[self.tA]
+        res = self.classify(example)
+        return 1 if valor == res else 0
 
 # TODO - Duda: Se deberia incluir el target att en el calculo? De momento se considera, pero para mi no esta bien
 # Test
-knn = KNN("JugarTenis",k=3)
-print knn.calcular_distancia(
+tA = "JugarTenis"
+inst = KNN(tA,K=3)
+
+print inst.distance(
     {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}, 
     {"Cielo":"Sol"   , "Temperatura":"Baja" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
 )
 
-print knn.clasificar(
+print inst.classify(
     {"Cielo":"Nubes" , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'+'}
+)
+
+print inst.predicts(
+    {"Cielo":"Nubes" , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
 )
