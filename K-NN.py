@@ -102,7 +102,7 @@ class KNN:
         return max(agrupados, key=lambda x:len(list(x[1])))[0]
         
 
-
+# TODO - Duda: Se deberia incluir el target att en el calculo? De momento se considera, pero para mi no esta bien
 # Test
 knn = KNN("JugarTenis",k=3)
 print knn.calcular_distancia(
