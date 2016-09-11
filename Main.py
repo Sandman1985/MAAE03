@@ -21,6 +21,7 @@ from KNN import KNN
 from csv import DictReader
 from random import shuffle
 import os
+from copy import deepcopy
 
 def data(csv_file,boolean,without):
     # Obtiene los ejemplos a partir de un archivo *.csv
@@ -127,7 +128,8 @@ texts = []
 for name,path in datasets.items():
     for boolean in boolean_set:
         for without in without_set:
-            for case,parm in parms.items():
+            for case,_parm in parms.items():
+                parm = deepcopy(_parm)
                 while parm['parm1']: # Prueba cada caso
                     
                     tcase = "%s %s %s %s G1&G2 with %s" % (name, case, boolean, without, "%s%s" % (parm["parm1name"],str(parm['parm1'][0])))
