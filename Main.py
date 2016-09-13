@@ -170,7 +170,7 @@ def format_time(s):
     return '%02d:%02d:%02d' % (h, m, s)
 
 # Comienzo principal
-line = '%-23s %14s %11s %10s %10s %8s %8s %8s\n' % ("CASO","DELTA_ESTIMADO","DELTA_REAL","VARIANZA","TIEMPO","#DATOS","#TRAIN","#TEST")
+line = '%-18s %14s %11s %10s %10s %8s %8s %8s\n' % ("CASO","DELTA_ESTIMADO","DELTA_REAL","VARIANZA","TIEMPO","#DATOS","#TRAIN","#TEST")
 with open('Summarize.txt','w') as f:
     f.write(line)
                 
@@ -181,7 +181,7 @@ for name,path in datasets.items():
             while parm['parm1']: # Prueba cada caso
                 
                 # Declarar caso caso
-                tcase = "%s %s %s with %s" % (name, case, boolean, "%s%s" % (parm["parm1name"],str(parm['parm1'][0])))
+                tcase = "%s %s %s %s" % (name, case, boolean, "%s=%s" % (parm["parm1name"],str(parm['parm1'][0])))
                 print "\n",tcase
                 
                 # Cargar el dataset
@@ -197,7 +197,7 @@ for name,path in datasets.items():
                 
                 # Imprimir resultado
                 print "\n",res
-                line = '%-23s %14.3f %11.3f %10.3f %10s %8i %8i %8i\n' % (tcase,dest,dreal,var,format_time(t_elapsed),total,ctrain,ctest)
+                line = '%-18s %14.3f %11.3f %10.3f %10s %8i %8i %8i\n' % (tcase,dest,dreal,var,format_time(t_elapsed),total,ctrain,ctest)
                 with open('Summarize.txt','a+') as f:
                     f.write(line)
                        
