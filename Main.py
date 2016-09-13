@@ -20,9 +20,7 @@ from KNN import KNN
 
 from csv    import DictReader
 from random import shuffle
-from copy   import deepcopy
-from os     import remove
-from os.path import exists
+from time   import time, strftime
 
 def data(csv_file,boolea):
     # Obtiene los ejemplos a partir de un archivo *.csv
@@ -124,23 +122,23 @@ def process(D,tA,parm,slice=0.2):
     
     test_size = int(round(len(D)*slice))
     test_sample, train_sample = D[:test_size], D[test_size:]
-    print "[DATOS] Total =",len(D),", Test =",len(test_sample),", Train =",len(train_sample)
     
     delta_estimated, variance = cross_validation(train_sample,tA,parm)
     delta_real                = delta(train_sample,test_sample,tA,parm)
     
-    return delta_estimated, variance, delta_real
+    return round(delta_estimated,3), round(variance,3), round(delta_real,3), len(D), len(test_sample), len(train_sample) 
 
 
 #########################    PRINCIPAL    ##############################
 tA = "G3"   
 
+# Filepath a los datasets
 datasets = { 
     "MAT":"Dataset/student-mat.csv",
     "POR":"Dataset/student-por.csv"
 }
-# cases = {"TEST":"Dataset/student-test.csv"}
 
+# Configuracion parametrica
 parms = {
 #     "DT":{
 #         "inst":DT,
@@ -154,45 +152,54 @@ parms = {
         "parm1name":"M",
         "KFold":10
     },
-    "KNN":{
-        "inst":KNN,
-        "parm1":[1,3], # k neighbors
-        "parm1name":"K",
-        "KFold":None # Usa LOO CV
-    }
+#     "KNN":{
+#         "inst":KNN,
+#         "parm1":[1,3], # k neighbors
+#         "parm1name":"K",
+#         "KFold":None # Usa LOO CV
+#     }
 }
 
 boolean_set = ["ORIG","BOOL"]
 
-remove('Summarize.txt') if exists('Summarize.txt') else None
+# Auxiliar
+def format_time(s):
+    m, s = divmod(s, 60)
+    h, m = divmod(m, 60)
+    d, h = divmod(h, 24)
+    return '%02d:%02d:%02d' % (h, m, s)
+
+# Comienzo principal
+line = '%-23s %14s %11s %10s %10s %8s %8s %8s\n' % ("CASO","DELTA_ESTIMADO","DELTA_REAL","VARIANZA","TIEMPO","#DATOS","#TRAIN","#TEST")
+with open('Summarize.txt','w') as f:
+    f.write(line)
+                
 for name,path in datasets.items():
     for boolean in boolean_set:
         for case,parm in parms.items():
             _parm = []
             while parm['parm1']: # Prueba cada caso
                 
-                # Descirbir caso
-                tcase = "%s %s %s with %s" % (
-                    name, 
-                    case, 
-                    boolean, 
-                    "%s%s" % (parm["parm1name"],str(parm['parm1'][0]))
-                )
+                # Declarar caso caso
+                tcase = "%s %s %s with %s" % (name, case, boolean, "%s%s" % (parm["parm1name"],str(parm['parm1'][0])))
                 print "\n",tcase
                 
                 # Cargar el dataset
                 dataset = data(path,boolean=="BOOL")
                 
-#                 try: # Procesar el caso, si ocurre un error se imprime (ocurre en NB cuando denominador 0 y m=0)
-                d_est, var, d_real = process(dataset,tA,parm)
-                res = "DELTA_ESTIMADO: %4.3f\nVARIANZA: %4.3f\nDELTA_REAL: %4.3f" % (d_est,var,d_real)
-#                 except Exception as error:
-#                     res = str(error)
-                print "\n",res
+                t_start = time()
+                try: # Procesar el caso, si ocurre un error se imprime (ocurre en NB cuando denominador 0 y m=0)
+                    dest, var, dreal, total, ctrain, ctest = process(dataset,tA,parm)
+                    res = "DELTA_ESTIMADO: %4.3f\nVARIANZA: %4.3f\nDELTA_REAL: %4.3f" % (dest,var,dreal)
+                except Exception as error:
+                    res = str(error)
+                t_elapsed = time() - t_start
                 
                 # Imprimir resultado
+                print "\n",res
+                line = '%-23s %14.3f %11.3f %10.3f %10s %8i %8i %8i\n' % (tcase,dest,dreal,var,format_time(t_elapsed),total,ctrain,ctest)
                 with open('Summarize.txt','a+') as f:
-                    f.write('\n'.join(["\n\n*** %s ***" % tcase , res]))
+                    f.write(line)
                        
                 _parm.append(parm['parm1'].pop(0))
                 

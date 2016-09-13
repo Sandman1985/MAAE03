@@ -82,7 +82,7 @@ class NB:
                 for valor in self.values[atributo]:
                     for tAval in self.values[self.tA]:
                         # aplica estimacion de probabilidades, suponiendo una predisposicion equitativa entre los valores de un atributo
-                        if (ctA[tAval] + self.m) == 0: raise Exception("%s has no value %s" % (self.tA,str(tAval)))
+                        if (ctA[tAval] + self.m) == 0: raise Exception("%s has no value %s in training data" % (self.tA,str(tAval)))
                         self.Pav[tAval][valor] = 1.0 * (cCond[(atributo,valor,tAval)] + (self.m * p)) / (ctA[tAval] + self.m)    
         
 #         print "Pv",len(self.Pv),self.Pv
