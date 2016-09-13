@@ -89,7 +89,7 @@ class DT:
         
         # Si todos los ejemplos tiene la misma polaridad, returna nodo con esa polaridad
         if len(self.values[self.tA])==1:
-            return Nodo(self.values[self.tA][0])
+            return Nodo(list(self.values[self.tA])[0])
         
         # Si no hay mas atributos o alcanza un max, retorna el mas comun
         if not attributes or (self.max_depht and depth > self.max_depht):
@@ -135,10 +135,13 @@ class DT:
         # 1 si predice ok, 0 sino
         valor = example[self.tA]
         res = self.classify(example)
-        return 1 if valor == res else 0
+        return 0 if valor == res else 1
+    
     
     def __str__(self):
         return self.tree.__str__()
+
+
 
 class Nodo:
 # Mantiene la estructura del arbol de decision

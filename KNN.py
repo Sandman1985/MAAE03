@@ -64,73 +64,73 @@ class KNN:
     	
     def distance(self,example1,example2):
 
-        def one_hot_encoding(att,val):
-            # Para una pareja (att,val) crea un vector según los valores de los ejemplos
-            # en donde vector_i = True si valores_ejemplo[att] = valor sino False. 
-            # Se agrega una dimension mas para contemplar el caso de que el valor nunca haya sido visto
-            # que adopta el valor True si _no_ esta en los ejemplos, sino False
-            encode = [True if v==val else False for v in self.values[att]]
-            encode.append(not (val in self.values[att]))
-            return encode
+        def one_hot_encoding(v):
+            # Codifica un vector cuyos valores pueden ser enumerados
+            # en un vector "aplanado" de dimension mayor con valores booleanos
+            # p.e. <...,A:Vi,...> -> <...,AisV1:False,...,AisVi:True,...,AisVn:False,...>
+            encoded_vector = {}
+            for att,val in v.items():
+                for pval in self.values[att]: # Posibles valores vistos (OBS: si no reconoce ninungo da False en todos)                  
+                    encoded_vector.update({"%s_is_%s"%(att,pval):(pval==val)})
+            return encoded_vector
         
-        def euclidean(v1,v2): # @TODO Al final no lo use
+        def euclidean(v1,v2): 
             # Calcula distancia euclidea enrte ds vectores
             return sqrt(sum((y-x)**2 for x,y in zip(v1,v2)))
         
-        # Calcular el one_hot_enconding para cada ejemplo
-        e1 = map(lambda (att,val):one_hot_encoding(att,val), example1.items())
-        e2 = map(lambda (att,val):one_hot_encoding(att,val), example2.items())
+        # Codificar por one_hot_enconding cada ejemplo
+        e1 = one_hot_encoding(example1)
+        e2 = one_hot_encoding(example2)
         
-        # Para cada codificación (e_i) calcular la distancia entre ellos para obtener la distancia total
-        return sqrt(sum((x-y)**2 for v1,v2 in zip(e1,e2) for x,y in zip(v1,v2)))
+        # Para cada codificación calcular la distancia
+        return euclidean(e1.values(),e2.values())
+
+#         #Codificar por one_hot_enconding cada ejemplo
+#         e1 = map(lambda (att,val):one_hot_encoding(att,val), example1.items())
+#         e2 = map(lambda (att,val):one_hot_encoding(att,val), example2.items())
+
+#         # Para cada codificación calcular la distancia entre ellos para obtener la distancia total
+#         return sqrt(sum((x-y)**2 for v1,v2 in zip(e1,e2) for x,y in zip(v1,v2))) 
 	
     
     def classify(self,new_exaple):
         # Devuelve la categoria para el nuevo ejemplo        
+    	ordenados = sorted(self.examples, # 
+                           key = lambda e: self.distance(new_exaple,{i:e[i] for i in e if i != self.tA}))
+        
         # Obtener los k vecinos mas cercanos
-    	ordenados = sorted(self.examples, key=lambda example : self.distance(new_exaple,example))
     	kvecinos = ordenados[:self.K]
-    	#esta parte es una opcion diseño, no se si sera lo correcto
-    	# aunque es discreto el target_attribute para aproximar mejor la solucion aplico como si fuera una solucion real
-    	# devuelvo el promedio de los k vecinos 
-#         salida = 0
-#         for vecino in k_cercanos:
-#             salida += vecino[self.target_attribute]
-#         
-#         return int(salida/self.k)
         
         # Agrupar por clases segun el atributo objetivo
-        agrupados = groupby(kvecinos, key=lambda s : s[self.tA])
+        agrupados = groupby(kvecinos, key=lambda s: s[self.tA])
         
         # Devolver el valor cuya clase sea mayoritaria en los k vecinos
+        # TODO - Si tengo mas de un maximo se queda con el primero que tenga
         return max(agrupados, key=lambda x:len(list(x[1])))[0]
     
     
     def predicts(self,example):
         # 1 si predice ok, 0 sino
-        valor = example[self.tA]
+        valor = example.pop(self.tA) # Quitar el atributo objetivo
         res = self.classify(example)
-        return 1 if valor == res else 0
-    
-    
-    def __str__(self):
-        return ""
+        example.update({self.tA:valor}) # Volver a colocar el atributo objetivo
+        return 0 if valor == res else 1
     
 
 # TODO - Duda: Se deberia incluir el target att en el calculo? De momento se considera, pero para mi no esta bien
 # Test
 # tA = "JugarTenis"
 # inst = KNN(tA,parm1=3)
-# 
+#  
 # print inst.distance(
 #     {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}, 
-#     {"Cielo":"Sol"   , "Temperatura":"Baja" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
+#     {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
 # )
-# 
+#  
 # print inst.classify(
 #     {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
 # )
-# 
+#  
 # print inst.predicts(
 #     {"Cielo":"Sol"   , "Temperatura":"Alta" , "Humedad":"Alta"  , "Viento":"Debil"  ,"JugarTenis":'-'}
 # )

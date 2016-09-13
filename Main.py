@@ -24,19 +24,59 @@ from copy   import deepcopy
 from os     import remove
 from os.path import exists
 
-def data(csv_file,boolean,without):
+def data(csv_file,boolea):
     # Obtiene los ejemplos a partir de un archivo *.csv
     with open(csv_file, mode='r') as f:
+        # Obtener datos crudos
         D = [row for row in DictReader(f,delimiter=";")]
-        # Procesamiento segun las flags
+        
+        # Quitar G1 y G2 del dataset 
+        D = [{k:v for k,v in d.items() if k!='G1' and k!='G2' } for d in D]
+        
+        # Preprocesamiento segun flags
         if boolean: # Transformar a booleano - Update no retorna valores, por eso no se asigna a nada
             [d.update({'absences':('Aceptable' if int(d['absences']) < 10 else 'Muchas')}) for d in D]
-            [d.update({'G1':('Malo' if int(d['G1']) < 12 else 'Bueno')}) for d in D]
-            [d.update({'G2':('Malo' if int(d['G2']) < 12 else 'Bueno')}) for d in D]
             [d.update({'G3':('Malo' if int(d['G3']) < 12 else 'Bueno')}) for d in D]
             [d.update({'age':('Menor' if int(d['age']) < 18 else 'Adulto')}) for d in D]
-        if without: # Remover G1 y G2
-            D = [{k:v for k,v in d.items() if k!='G1' and k!='G2' } for d in D]
+        
+        # Normalizar valors en [0,1]
+#         [d.update({'school':(0 if d['school']=="GP" else 1)}) for d in D]
+#         [d.update({'sex'   :(0 if d['sex']=="F"  else 1)}) for d in D]
+#         if boolean:
+#             [d.update({'age':(0 if d['age']=="Menor" else 1)}) for d in D]
+#             [d.update({'absences':(0 if d['absences']=="Aceptable" else 1)}) for d in D]
+#             [d.update({'G3':(0 if d['age']=="Malo" else 1)}) for d in D]
+#         else:
+#             [d.update({'age':(1.0 * (int(d['age']) - 15) / 8)}) for d in D]
+#             [d.update({'absences':(1.0 * (int(d['absences'])) / 94)}) for d in D]
+#             [d.update({'G3':(1.0 * (int(d['G3'])) / 21)}) for d in D]
+#         [d.update({'address'   :(0 if d['address']=="U" else 1)}) for d in D]
+#         [d.update({'famsize'   :(0 if d['famsize']=="LE3" else 1)}) for d in D]
+#         [d.update({'Pstatus'   :(0 if d['Pstatus']=="T" else 1)}) for d in D]
+#         [d.update({'Medu'      :(1.0 * (int(d['Medu'])) / 5)}) for d in D]
+#         [d.update({'Fedu'      :(1.0 * (int(d['Fedu'])) / 5)}) for d in D]
+#         [d.update({'Mjob'      :(0 if d['Mjob']=="teacher" else 0.25 if d['Mjob']=="health" else 0.5 if d['Mjob']=="services" else 0.75 if d['Mjob']=="at_home" else 1.0)}) for d in D]
+#         [d.update({'Fjob'      :(0 if d['Fjob']=="teacher" else 0.25 if d['Fjob']=="health" else 0.5 if d['Fjob']=="services" else 0.75 if d['Fjob']=="at_home" else 1.0)}) for d in D]
+#         [d.update({'reason'    :(0 if d['reason']=="home" else 0.33 if d['reason']=="reputation" else 0.66 if d['reason']=="course" else 1.0)}) for d in D]
+#         [d.update({'guardian'  :(0 if d['guardian']=="mother" else 0.5 if d['guardian']=="father" else 1.0)}) for d in D]
+#         [d.update({'traveltime':(1.0 * (int(d['traveltime']) - 1) / 3)}) for d in D]
+#         [d.update({'studytime' :(1.0 * (int(d['studytime']) - 1) / 3)}) for d in D]
+#         [d.update({'failures'  :(1.0 * (int(d['failures'])) / 4)}) for d in D]
+#         [d.update({'schoolsup' :(0 if d['schoolsup']=="yes" else 1)}) for d in D]
+#         [d.update({'famsup'    :(0 if d['famsup']=="yes" else 1)}) for d in D]
+#         [d.update({'paid'      :(0 if d['paid']=="yes" else 1)}) for d in D]
+#         [d.update({'activities':(0 if d['activities']=="yes" else 1)}) for d in D]
+#         [d.update({'nursery'   :(0 if d['nursery']=="yes" else 1)}) for d in D]
+#         [d.update({'higher'    :(0 if d['higher']=="yes" else 1)}) for d in D]
+#         [d.update({'internet'  :(0 if d['internet']=="yes" else 1)}) for d in D]
+#         [d.update({'romantic'  :(0 if d['romantic']=="yes" else 1)}) for d in D]
+#         [d.update({'famrel'    :(1.0 * (int(d['famrel']) - 1) / 4)}) for d in D]
+#         [d.update({'freetime'  :(1.0 * (int(d['freetime']) - 1) / 4)}) for d in D]
+#         [d.update({'goout'     :(1.0 * (int(d['goout']) - 1) / 4)}) for d in D]
+#         [d.update({'Dalc'      :(1.0 * (int(d['Dalc']) - 1) / 4)}) for d in D]
+#         [d.update({'Walc'      :(1.0 * (int(d['Walc']) - 1) / 4)}) for d in D]
+#         [d.update({'health'    :(1.0 * (int(d['health']) - 1) / 4)}) for d in D]
+        
         return D 
 
         
@@ -104,7 +144,7 @@ datasets = {
 parms = {
 #     "DT":{
 #         "inst":DT,
-#         "parm1":[5,10,None], # max depth
+#         "parm1":[None,5], # max depth
 #         "parm1name":"DEPTH",
 #         "KFold":10
 #     },
@@ -114,50 +154,47 @@ parms = {
         "parm1name":"M",
         "KFold":10
     },
-#     "KNN":{
-#         "inst":KNN,
-#         "parm1":[1,2,3], # k neighbors
-#         "parm1name":"K",
-#         "KFold":None # Usa LOO CV
-#     }
+    "KNN":{
+        "inst":KNN,
+        "parm1":[1,3], # k neighbors
+        "parm1name":"K",
+        "KFold":None # Usa LOO CV
+    }
 }
 
 boolean_set = ["ORIG","BOOL"]
-without_set = ["CON","SIN"]
 
 remove('Summarize.txt') if exists('Summarize.txt') else None
 for name,path in datasets.items():
     for boolean in boolean_set:
-        for without in without_set:
-            for case,parm in parms.items():
-                _parm = []
-                while parm['parm1']: # Prueba cada caso
-                    
-                    # Descirbir caso
-                    tcase = "%s %s %s %s G1&G2 with %s" % (
-                        name, 
-                        case, 
-                        boolean, 
-                        without, 
-                        "%s%s" % (parm["parm1name"],str(parm['parm1'][0]))
-                    )
-                    print "\n",tcase
-                    
-                    # Cargar el dataset
-                    dataset = data(path,boolean=="BOOL",without=="SIN")
-                    
-                    try: # Procesar el caso, si ocurre un error se imprime
-                        d_est, var, d_real = process(dataset,tA,parm)
-                        res = "DELTA_ESTIMADO: %f\nVARIANZA: %5.3f\nDELTA_REAL: %f" % (d_est,var,d_real)
-                    except Exception as error:
-                        res = str(error)
-                    print "\n",res
-                    
-                    # Imprimir resultado
-                    with open('Summarize.txt','a+') as f:
-                        f.write('\n'.join(["\n\n*** %s ***" % tcase , res]))
-                           
-                    _parm.append(parm['parm1'].pop(0))
-                    
-                parm['parm1'] = _parm        
+        for case,parm in parms.items():
+            _parm = []
+            while parm['parm1']: # Prueba cada caso
+                
+                # Descirbir caso
+                tcase = "%s %s %s with %s" % (
+                    name, 
+                    case, 
+                    boolean, 
+                    "%s%s" % (parm["parm1name"],str(parm['parm1'][0]))
+                )
+                print "\n",tcase
+                
+                # Cargar el dataset
+                dataset = data(path,boolean=="BOOL")
+                
+#                 try: # Procesar el caso, si ocurre un error se imprime (ocurre en NB cuando denominador 0 y m=0)
+                d_est, var, d_real = process(dataset,tA,parm)
+                res = "DELTA_ESTIMADO: %4.3f\nVARIANZA: %4.3f\nDELTA_REAL: %4.3f" % (d_est,var,d_real)
+#                 except Exception as error:
+#                     res = str(error)
+                print "\n",res
+                
+                # Imprimir resultado
+                with open('Summarize.txt','a+') as f:
+                    f.write('\n'.join(["\n\n*** %s ***" % tcase , res]))
+                       
+                _parm.append(parm['parm1'].pop(0))
+                
+            parm['parm1'] = _parm        
               
