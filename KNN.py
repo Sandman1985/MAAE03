@@ -84,9 +84,9 @@ class KNN:
             # p.e. <...,A:Vi,...> -> <...,AisV1:False,...,AisVi:True,...,AisVn:False,...>
             return {"%s_is_%s"%(att,pval) : (1 if pval==val else 0) for pval in self.values[att]}
         
-        def hamming(v1,v2):
+        def hamming(v1):
             # Calcula la distancia de hamming entre dos vectores booleanos
-            return sum(abs(y-x) for x,y in zip(v1,v2))
+            return sum(abs(y-x) for x,y in zip(v1,[0,0,0,0,0,0,0,0])
         
         def euclidean(v1,v2): 
             # Calcula distancia euclidea enrte dos vectores
@@ -101,8 +101,8 @@ class KNN:
                 e2.update(normalize(att, example2[att]))
             # Si el valor es string (categorial) calcula el one-hot-encodig aplanado
             if type(example1[att]) is str:
-                e1.update(one_hot_encoding(att,example1[att]))
-                e2.update(one_hot_encoding(att,example2[att]))
+                e1.update(hamming(one_hot_encoding(att,example1[att])))
+                e2.update(hamming(one_hot_encoding(att,example2[att])))
         
         # Para cada codificación calcular la distancia
         return euclidean(e1.values(),e2.values())

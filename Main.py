@@ -107,7 +107,7 @@ def cross_validation(S,tA,parm):
     CVset = list(KFold(S,parm["KFold"]) if parm["KFold"] else LOO(S))
     deltas, cont, total = [], 1, len(CVset)
     for train, test in CVset:
-        print "\r[CROSS-VALIDATION] Progress: %i/%i" % (cont,total),
+        print "\r[CROSS-VALIDATION] Progress: %i/%i" % (cont,total)
         current_delta = delta(train,test,tA,parm)
         deltas.append(current_delta)
         cont += 1
@@ -143,18 +143,18 @@ datasets = {
 
 # Configuracion parametrica
 parms = {
-#     "DT":{
-#         "inst":DT,
-#         "parm1":[None,5], # max depth
-#         "parm1name":"DEPTH",
-#         "KFold":10
-#     },
-#     "NB":{
-#         "inst":NB,
-#         "parm1":[0,0.5,1], # equivalent sample data
-#         "parm1name":"M",
-#         "KFold":10
-#     },
+     "DT":{
+         "inst":DT,
+         "parm1":[None,5], # max depth
+         "parm1name":"DEPTH",
+         "KFold":None
+     },
+     "NB":{
+         "inst":NB,
+         "parm1":[0,0.5,1], # equivalent sample data
+         "parm1name":"M",
+         "KFold":None
+     },
     "KNN":{
         "inst":KNN,
         "parm1":[1,3], # k neighbors
