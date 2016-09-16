@@ -43,7 +43,9 @@ class KNN:
     tA      = None
     
     # Exlcusivos
-    K = 1
+    K     = 1
+    mu    = defaultdict(lambda:0)
+    sigma = defaultdict(lambda:0)
 	
     
     def __init__(self,tA,ejemplos=None,parm1=None):
@@ -60,37 +62,50 @@ class KNN:
         for example in self.examples:
             for atributo,valor in example.items():
                 self.values[atributo].add(valor)
-	
-    	
-    def distance(self,example1,example2):
+                
+        # Obtener mu y sigma para poder normalizar
+        for att,vals in self.values.items():
+            if all(type(val) is int for val in vals): # Solo cuando los valores sean enteros
+                size = len(vals)
+                self.mu[att]    =      1.0/size * sum(vals) 
+                self.sigma[att] = sqrt(1.0/size * sum((val - self.mu[att])**2 for val in vals))
 
-        def one_hot_encoding(v):
+            
+    def distance(self,example1,example2):
+        
+        def normalize(att,val):
+            # Normaliza el valor para el atributo en la muestra
+            if self.sigma[att] == 0 : print att,val,self.mu[att]
+            return {att : 1.0/self.sigma[att] * (val - self.mu[att])} 
+        
+        def one_hot_encoding(att,val):
             # Codifica un vector cuyos valores pueden ser enumerados
             # en un vector "aplanado" de dimension mayor con valores booleanos
             # p.e. <...,A:Vi,...> -> <...,AisV1:False,...,AisVi:True,...,AisVn:False,...>
-            encoded_vector = {}
-            for att,val in v.items():
-                for pval in self.values[att]: # Posibles valores vistos (OBS: si no reconoce ninungo da False en todos)                  
-                    encoded_vector.update({"%s_is_%s"%(att,pval):(pval==val)})
-            return encoded_vector
+            return {"%s_is_%s"%(att,pval) : (1 if pval==val else 0) for pval in self.values[att]}
+        
+        def hamming(v1,v2):
+            # Calcula la distancia de hamming entre dos vectores booleanos
+            return sum(abs(y-x) for x,y in zip(v1,v2))
         
         def euclidean(v1,v2): 
-            # Calcula distancia euclidea enrte ds vectores
+            # Calcula distancia euclidea enrte dos vectores
             return sqrt(sum((y-x)**2 for x,y in zip(v1,v2)))
         
-        # Codificar por one_hot_enconding cada ejemplo
-        e1 = one_hot_encoding(example1)
-        e2 = one_hot_encoding(example2)
+        # Obtener vectores codigicados segun los valores de los atributos
+        e1,e2 = {},{}
+        for att in example1:
+            # Si el valor es entero lo normaliza segun sigma y mu 
+            if type(example1[att]) is int:
+                e1.update(normalize(att, example1[att]))
+                e2.update(normalize(att, example2[att]))
+            # Si el valor es string (categorial) calcula el one-hot-encodig aplanado
+            if type(example1[att]) is str:
+                e1.update(one_hot_encoding(att,example1[att]))
+                e2.update(one_hot_encoding(att,example2[att]))
         
         # Para cada codificación calcular la distancia
         return euclidean(e1.values(),e2.values())
-
-#         #Codificar por one_hot_enconding cada ejemplo
-#         e1 = map(lambda (att,val):one_hot_encoding(att,val), example1.items())
-#         e2 = map(lambda (att,val):one_hot_encoding(att,val), example2.items())
-
-#         # Para cada codificación calcular la distancia entre ellos para obtener la distancia total
-#         return sqrt(sum((x-y)**2 for v1,v2 in zip(e1,e2) for x,y in zip(v1,v2))) 
 	
     
     def classify(self,new_exaple):

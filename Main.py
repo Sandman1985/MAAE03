@@ -29,8 +29,11 @@ def data(csv_file,boolea):
         D = [row for row in DictReader(f,delimiter=";")]
         
         # Quitar G1 y G2 del dataset 
-        D = [{k:v for k,v in d.items() if k!='G1' and k!='G2' } for d in D]
+        D = [{k:v for k,v in d.items() if k!='G1' and k!='G2'} for d in D]
         
+        # Obtener aquellos datos que sean numericos
+        D = [{k:(int(v) if v.isdigit() else v) for k,v in d.items()} for d in D]
+
         # Preprocesamiento segun flags
         if boolean: # Transformar a booleano - Update no retorna valores, por eso no se asigna a nada
             [d.update({'absences':('Aceptable' if int(d['absences']) < 10 else 'Muchas')}) for d in D]
@@ -146,18 +149,18 @@ parms = {
 #         "parm1name":"DEPTH",
 #         "KFold":10
 #     },
-    "NB":{
-        "inst":NB,
-        "parm1":[0,0.5,1], # equivalent sample data
-        "parm1name":"M",
-        "KFold":10
-    },
-#     "KNN":{
-#         "inst":KNN,
-#         "parm1":[1,3], # k neighbors
-#         "parm1name":"K",
-#         "KFold":None # Usa LOO CV
-#     }
+#     "NB":{
+#         "inst":NB,
+#         "parm1":[0,0.5,1], # equivalent sample data
+#         "parm1name":"M",
+#         "KFold":10
+#     },
+    "KNN":{
+        "inst":KNN,
+        "parm1":[1,3], # k neighbors
+        "parm1name":"K",
+        "KFold":None # Usa LOO CV
+    }
 }
 
 boolean_set = ["ORIG","BOOL"]
@@ -188,11 +191,11 @@ for name,path in datasets.items():
                 dataset = data(path,boolean=="BOOL")
                 
                 t_start = time()
-                try: # Procesar el caso, si ocurre un error se imprime (ocurre en NB cuando denominador 0 y m=0)
-                    dest, var, dreal, total, ctrain, ctest = process(dataset,tA,parm)
-                    res = "DELTA_ESTIMADO: %4.3f\nVARIANZA: %4.3f\nDELTA_REAL: %4.3f" % (dest,var,dreal)
-                except Exception as error:
-                    res = str(error)
+#                 try: # Procesar el caso, si ocurre un error se imprime (ocurre en NB cuando denominador 0 y m=0)
+                dest, var, dreal, total, ctrain, ctest = process(dataset,tA,parm)
+                res = "DELTA_ESTIMADO: %4.3f\nVARIANZA: %4.3f\nDELTA_REAL: %4.3f" % (dest,var,dreal)
+#                 except Exception as error:
+#                     res = str(error)
                 t_elapsed = time() - t_start
                 
                 # Imprimir resultado
