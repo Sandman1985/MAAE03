@@ -20,7 +20,7 @@ from KNN import KNN
 
 from csv    import DictReader
 from random import shuffle
-from time   import time, strftime
+from time   import time
 
 def data(csv_file,boolea):
     # Obtiene los ejemplos a partir de un archivo *.csv
@@ -39,44 +39,6 @@ def data(csv_file,boolea):
             [d.update({'absences':('Aceptable' if int(d['absences']) < 10 else 'Muchas')}) for d in D]
             [d.update({'G3':('Malo' if int(d['G3']) < 12 else 'Bueno')}) for d in D]
             [d.update({'age':('Menor' if int(d['age']) < 18 else 'Adulto')}) for d in D]
-        
-        # Normalizar valors en [0,1]
-#         [d.update({'school':(0 if d['school']=="GP" else 1)}) for d in D]
-#         [d.update({'sex'   :(0 if d['sex']=="F"  else 1)}) for d in D]
-#         if boolean:
-#             [d.update({'age':(0 if d['age']=="Menor" else 1)}) for d in D]
-#             [d.update({'absences':(0 if d['absences']=="Aceptable" else 1)}) for d in D]
-#             [d.update({'G3':(0 if d['age']=="Malo" else 1)}) for d in D]
-#         else:
-#             [d.update({'age':(1.0 * (int(d['age']) - 15) / 8)}) for d in D]
-#             [d.update({'absences':(1.0 * (int(d['absences'])) / 94)}) for d in D]
-#             [d.update({'G3':(1.0 * (int(d['G3'])) / 21)}) for d in D]
-#         [d.update({'address'   :(0 if d['address']=="U" else 1)}) for d in D]
-#         [d.update({'famsize'   :(0 if d['famsize']=="LE3" else 1)}) for d in D]
-#         [d.update({'Pstatus'   :(0 if d['Pstatus']=="T" else 1)}) for d in D]
-#         [d.update({'Medu'      :(1.0 * (int(d['Medu'])) / 5)}) for d in D]
-#         [d.update({'Fedu'      :(1.0 * (int(d['Fedu'])) / 5)}) for d in D]
-#         [d.update({'Mjob'      :(0 if d['Mjob']=="teacher" else 0.25 if d['Mjob']=="health" else 0.5 if d['Mjob']=="services" else 0.75 if d['Mjob']=="at_home" else 1.0)}) for d in D]
-#         [d.update({'Fjob'      :(0 if d['Fjob']=="teacher" else 0.25 if d['Fjob']=="health" else 0.5 if d['Fjob']=="services" else 0.75 if d['Fjob']=="at_home" else 1.0)}) for d in D]
-#         [d.update({'reason'    :(0 if d['reason']=="home" else 0.33 if d['reason']=="reputation" else 0.66 if d['reason']=="course" else 1.0)}) for d in D]
-#         [d.update({'guardian'  :(0 if d['guardian']=="mother" else 0.5 if d['guardian']=="father" else 1.0)}) for d in D]
-#         [d.update({'traveltime':(1.0 * (int(d['traveltime']) - 1) / 3)}) for d in D]
-#         [d.update({'studytime' :(1.0 * (int(d['studytime']) - 1) / 3)}) for d in D]
-#         [d.update({'failures'  :(1.0 * (int(d['failures'])) / 4)}) for d in D]
-#         [d.update({'schoolsup' :(0 if d['schoolsup']=="yes" else 1)}) for d in D]
-#         [d.update({'famsup'    :(0 if d['famsup']=="yes" else 1)}) for d in D]
-#         [d.update({'paid'      :(0 if d['paid']=="yes" else 1)}) for d in D]
-#         [d.update({'activities':(0 if d['activities']=="yes" else 1)}) for d in D]
-#         [d.update({'nursery'   :(0 if d['nursery']=="yes" else 1)}) for d in D]
-#         [d.update({'higher'    :(0 if d['higher']=="yes" else 1)}) for d in D]
-#         [d.update({'internet'  :(0 if d['internet']=="yes" else 1)}) for d in D]
-#         [d.update({'romantic'  :(0 if d['romantic']=="yes" else 1)}) for d in D]
-#         [d.update({'famrel'    :(1.0 * (int(d['famrel']) - 1) / 4)}) for d in D]
-#         [d.update({'freetime'  :(1.0 * (int(d['freetime']) - 1) / 4)}) for d in D]
-#         [d.update({'goout'     :(1.0 * (int(d['goout']) - 1) / 4)}) for d in D]
-#         [d.update({'Dalc'      :(1.0 * (int(d['Dalc']) - 1) / 4)}) for d in D]
-#         [d.update({'Walc'      :(1.0 * (int(d['Walc']) - 1) / 4)}) for d in D]
-#         [d.update({'health'    :(1.0 * (int(d['health']) - 1) / 4)}) for d in D]
         
         return D 
 
@@ -107,7 +69,7 @@ def cross_validation(S,tA,parm):
     CVset = list(KFold(S,parm["KFold"]) if parm["KFold"] else LOO(S))
     deltas, cont, total = [], 1, len(CVset)
     for train, test in CVset:
-        print "\r[CROSS-VALIDATION] Progress: %i/%i" % (cont,total)
+        print "\r[CROSS-VALIDATION] Progress: %i/%i" % (cont,total),
         current_delta = delta(train,test,tA,parm)
         deltas.append(current_delta)
         cont += 1
@@ -143,37 +105,57 @@ datasets = {
 
 # Configuracion parametrica
 parms = {
-     "DT":{
-         "inst":DT,
-         "parm1":[None,5], # max depth
-         "parm1name":"DEPTH",
-         "KFold":None
-     },
-     "NB":{
-         "inst":NB,
-         "parm1":[0,0.5,1], # equivalent sample data
-         "parm1name":"M",
-         "KFold":None
-     },
-    "KNN":{
-        "inst":KNN,
-        "parm1":[1,3], # k neighbors
-        "parm1name":"K",
-        "KFold":None # Usa LOO CV
-    }
+#      "DT":{
+#          "inst":DT,
+#          "parm1":[5], # max depth
+#          "parm1name":"DEPTH",
+#          "KFold":10
+#      },
+    "NB":{
+        "inst":NB,
+        "parm1":[0,0.5,1], # equivalent sample data
+        "parm1name":"M",
+        "KFold":10
+    },
+#     "KNN":{
+#         "inst":KNN,
+#         "parm1":[1,3], # k neighbors
+#         "parm1name":"K",
+#         "KFold":None # Usa LOO CV
+#     }
 }
 
 boolean_set = ["ORIG","BOOL"]
 
 # Auxiliar
 def format_time(s):
+    # Da formato HH:MM:SS a partir de segundos
     m, s = divmod(s, 60)
     h, m = divmod(m, 60)
     d, h = divmod(h, 24)
     return '%02d:%02d:%02d' % (h, m, s)
 
+def print_chart(x,y,label,name):
+    # Genera una grafica de barras
+    import matplotlib.pyplot as plt
+    from matplotlib import rcParams
+    rcParams.update({'figure.autolayout': True})
+    x_pos = xrange(len(x))
+    plt.bar(
+        x_pos,
+        y,
+        align = 'center', 
+        alpha = 0.4,
+        color = 'blue'
+    )
+    plt.xticks(x_pos, x, rotation=40, ha='right')
+    plt.ylabel(label)
+    plt.title('Result %s' % name)
+    plt.savefig(name)
+
 # Comienzo principal
-line = '%-18s %14s %11s %10s %10s %8s %8s %8s\n' % ("CASO","DELTA_ESTIMADO","DELTA_REAL","VARIANZA","TIEMPO","#DATOS","#TRAIN","#TEST")
+chart = {'case':[],'dreal':[],'dest':[],'var':[],'time':[]}
+line = '%-20s %14s %11s %10s %10s %8s %8s %8s\n' % ("CASO","DELTA_ESTIMADO","DELTA_REAL","VARIANZA","TIEMPO","#DATOS","#TRAIN","#TEST")
 with open('Summarize.txt','w') as f:
     f.write(line)
                 
@@ -200,11 +182,24 @@ for name,path in datasets.items():
                 
                 # Imprimir resultado
                 print "\n",res
-                line = '%-18s %14.3f %11.3f %10.3f %10s %8i %8i %8i\n' % (tcase,dest,dreal,var,format_time(t_elapsed),total,ctrain,ctest)
+                line = '%-20s %14.3f %11.3f %10.3f %10s %8i %8i %8i\n' % (tcase,dest,dreal,var,format_time(t_elapsed),total,ctrain,ctest)
                 with open('Summarize.txt','a+') as f:
                     f.write(line)
-                       
+                
+                # Agregar datos para graficar
+                chart['case'].append(tcase)
+                chart['dreal'].append(dreal)
+                chart['dest'].append(dest)
+                chart['var'].append(var)
+                chart['time'].append(t_elapsed)
+                     
                 _parm.append(parm['parm1'].pop(0))
                 
-            parm['parm1'] = _parm        
-              
+            parm['parm1'] = _parm 
+        
+        
+# Graficar resultados    
+print_chart(chart['case'], chart['time'],'seg','By_time.png')
+print_chart(chart['case'], chart['dreal'],'rate','By_dreal.png')
+print_chart(chart['case'], chart['dest'],'rate','By_dest.png')       
+      

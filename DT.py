@@ -71,60 +71,80 @@ class DT:
                 self.values[atributo].add(valor)
         
         Atts = [A for A in self.examples[0].keys() if A != tA]
-        self.tree = self.ID3(Atts,self.examples)
+        self.tree = self.decision_tree(Atts)
      
                 		    
-    def ID3(self,attributes,S, depth=0):
+    def decision_tree(self,attributes):
         # Computa el algoritmo ID3
         
-        def mas_comun(tA,S=self.examples):
+        def mas_comun(S=self.examples):
             # Determina cual es el valor mas comun para el atributo objetivo
             # para un determinado subconjunto de ejemplos
-            polaridades = map(lambda s: s[tA],S) 
+            polaridades = map(lambda s: s[self.tA],S) 
             return max(polaridades, key=polaridades.count)
         
         def subS(v,S,A):
             # Calcula subconjunto de S donde el atributo A tiene valor v
             return [s for s in S if s[A] == v]
         
-        # Si todos los ejemplos tiene la misma polaridad, returna nodo con esa polaridad
-        if len(self.values[self.tA])==1:
-            return Nodo(list(self.values[self.tA])[0])
+#         def subclasses(S):
+#             ordenado = sorted(S, key=lambda s : s[self.tA])
+#             agrupado = groupby(ordenado, key=lambda s : s[self.tA])
+#             # Obtiene las sublclases de S segun su polaridad
+#             return [[y for y in list(x[1])] for x in agrupado]
         
-        # Si no hay mas atributos o alcanza un max, retorna el mas comun
-        if not attributes or (self.max_depht and depth > self.max_depht):
-            return Nodo(mas_comun(self.tA,S))
+        def subclasses(S):
+            count = defaultdict(lambda:0)
+            for s in S: # Cuenta la cantidad por clase
+                val = s[self.tA]
+                count[val] += 1
+            return count
         
-        # En otro caso
-        def mejor_clasifica(As,tA):            
-            def information_gain(A,tA,S):
-                def entropy(S,tA):                    
-                    def subclases(S):
-                        ordenado = sorted(S, key=lambda s : s[tA])
-                        agrupado = groupby(ordenado, key=lambda s : s[tA])
-                        # Obtiene las sublclases de S segun su polaridad
-                        return [[y for y in list(x[1])] for x in agrupado]
-                    # Calcula la entropia de S a partir de las subclases
-                    return sum(-(1.0*len(subclass)/len(S))*log((1.0*len(subclass)/len(S)),2) for subclass in subclases(S))
-                # Calcula Information Gain a partir de la entropia y las sublcases
-                return entropy(S,tA) - sum(entropy(subS(v,S,A),tA) * len(subS(v,S,A))/len(S) for v in self.values[A])
+        def entropy(S):   
+            # Calcula la entropia de S a partir de las subclases
+#             return sum(-(1.0*len(subclass)/len(S))*log((1.0*len(subclass)/len(S)),2) for subclass in subclasses(S))
+            acc,lenS = 0,len(S)
+            for lenSubS in subclasses(S).values():
+                acc += -(1.0*lenSubS/lenS) * log((1.0*lenSubS/lenS),2)
+            return acc
+        
+        def information_gain(A,S):
+            # Calcula Information Gain a partir de la entropia y las sublcases
+            acc = 0
+            for v in self.values[A]:
+                vSA = subS(v,S,A)
+                acc += entropy(vSA) * len(vSA)/len(S)
+            return entropy(S) - acc
+        
+        def mejor_clasifica(As):            
             # Determina cual es el mejor atributo que clasifica a los ejemplos segun el Information Gain
-            return max(As, key=lambda A : information_gain(A,tA,self.examples))
-               
-        A = mejor_clasifica(attributes,self.tA)
-        raiz = Nodo(A,mas_comun(self.tA,S))
-        for value in self.values[A]: # Buscar hijos
-            ejemplos_v = subS(value, S, A)
-            if not ejemplos_v:
-                hijo = Nodo(mas_comun(self.tA))
-            else:
-                attributes.remove(A)
-                hijo = self.ID3(attributes, S=ejemplos_v,depth=depth+1)
-                attributes.append(A)
-            raiz.add_hijo(hijo,value)                
+            return max(As, key=lambda A : information_gain(A,self.examples))
         
-        return raiz
-    
+        def ID3(atts,S,depth):
+            # Si todos los ejemplos tiene la misma polaridad, returna nodo con esa polaridad
+            if len(self.values[self.tA])==1:
+                return Nodo(list(self.values[self.tA])[0])
+            
+            # Si no hay mas atributos o alcanza un max, retorna el mas comun
+            if not atts or depth > self.max_depht:
+                return Nodo(mas_comun(S))
+            
+            # En otro caso       
+            A = mejor_clasifica(atts)
+            raiz = Nodo(A,mas_comun(S))
+            for value in self.values[A]: # Buscar hijos
+                ejemplos_v = subS(value,S,A)
+                if not ejemplos_v:
+                    hijo = Nodo(mas_comun())
+                else:
+                    atts.remove(A)
+                    hijo = ID3(atts,S=ejemplos_v,depth=depth+1)
+                    atts.append(A)
+                raiz.add_hijo(hijo,value)                
+            
+            return raiz
+        
+        return ID3(attributes,self.examples,0)
     
     def classify(self,new_example):
         # Devuelve la categoria para el nuevo ejemplo
