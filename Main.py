@@ -200,8 +200,8 @@ for name,path in datasets.items():
             parm['parm1'] = _parm 
             
             # Graficar resultados    
-            print_chart(chart['case'], chart['time'],'seg','By_time.png')
-            print_chart(chart['case'], chart['dreal'],'rate','By_dreal.png')
-            print_chart(chart['case'], chart['dest'],'rate','By_dest.png')    
+            print_chart(chart['case'], chart['time'],'seg','%s_by_time.png' % case)
+            print_chart(chart['case'], chart['dreal'],'rate','%s_by_dreal.png'% case)
+            print_chart(chart['case'], chart['dest'],'rate','%s_by_dest.png'% case)    
             chart = {'case':[],'dreal':[],'dest':[],'var':[],'time':[]}
       
