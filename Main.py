@@ -22,6 +22,10 @@ from csv    import DictReader
 from random import shuffle
 from time   import time
 
+import matplotlib.pyplot as plt
+from matplotlib import rcParams
+rcParams.update({'figure.autolayout': True})
+
 def data(csv_file,boolea):
     # Obtiene los ejemplos a partir de un archivo *.csv
     with open(csv_file, mode='r') as f:
@@ -137,9 +141,7 @@ def format_time(s):
 
 def print_chart(x,y,label,name):
     # Genera una grafica de barras
-    import matplotlib.pyplot as plt
-    from matplotlib import rcParams
-    rcParams.update({'figure.autolayout': True})
+    plt.clf()
     x_pos = xrange(len(x))
     plt.bar(
         x_pos,
