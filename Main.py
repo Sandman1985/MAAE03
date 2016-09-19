@@ -137,33 +137,38 @@ def format_time(s):
     m, s = divmod(s, 60)
     h, m = divmod(m, 60)
     d, h = divmod(h, 24)
-    return '%02d:%02d:%02d' % (h, m, s)
+    return '%02d:%02d:%04.2f' % (h, m, s)
 
-def print_chart(x,y,label,name):
+def print_chart(x,y_dict,y_label,name):
     # Genera una grafica de barras
     plt.clf()
+    plt.gca().set_xlim(-1,len(x))
     x_pos = xrange(len(x))
-    plt.bar(
-        x_pos,
-        y,
-        align = 'center', 
-        alpha = 0.4,
-        color = 'blue'
-    )
+    i,colors=0,['#00007A','#0000F7']
+    for label,y in y_dict.items():
+        plt.bar(
+            x_pos,
+            y,
+            align = 'center', 
+            alpha = 0.4,
+            label = label,
+            color = 'Blue'
+        )
+        i+=1
     plt.xticks(x_pos, x, rotation=40, ha='right')
-    plt.ylabel(label)
+    plt.ylabel(y_label)
     plt.title('Result %s' % name)
-    plt.savefig(name)
+    plt.savefig("%s.png" % name.replace(" ","_"))
 
 # Comienzo principal
-line = '%-20s %14s %11s %10s %10s %8s %8s %8s\n' % ("CASO","DELTA_ESTIMADO","DELTA_REAL","VARIANZA","TIEMPO","#DATOS","#TRAIN","#TEST")
+line = '%-20s %14s %11s %10s %10s %12s %8s %8s\n' % ("CASO","DELTA_ESTIMADO","DELTA_REAL","VARIANZA","TIEMPO","#DATOS","#TRAIN","#TEST")
 with open('Summarize.txt','w') as f:
     f.write(line)
-                
-for name,path in datasets.items():
+    
+chart = {'case':[],'dreal':[],'dest':[],'var':[],'time':[]}            
+for case,parm in parms.items():
     for boolean in boolean_set:
-        for case,parm in parms.items():
-            chart = {'case':[],'dreal':[],'dest':[],'var':[],'time':[]}
+        for name,path in datasets.items():
             _parm = []
             while parm['parm1']: # Prueba cada caso
                 
@@ -184,7 +189,7 @@ for name,path in datasets.items():
                 
                 # Imprimir resultado
                 print "\n",res
-                line = '%-20s %14.3f %11.3f %10.3f %10s %8i %8i %8i\n' % (tcase,dest,dreal,var,format_time(t_elapsed),total,ctrain,ctest)
+                line = '%-20s %14.3f %11.3f %10.3f %10s %12i %8i %8i\n' % (tcase,dest,dreal,var,format_time(t_elapsed),total,ctrain,ctest)
                 with open('Summarize.txt','a+') as f:
                     f.write(line)
                 
@@ -192,15 +197,13 @@ for name,path in datasets.items():
                 chart['case'].append(tcase)
                 chart['dreal'].append(dreal)
                 chart['dest'].append(dest)
-                chart['var'].append(var)
                 chart['time'].append(t_elapsed)
                      
                 _parm.append(parm['parm1'].pop(0))
                 
             parm['parm1'] = _parm 
             
-            # Graficar resultados    
-            print_chart(chart['case'], chart['time'],'seg','%s_by_time.png' % case)
-            print_chart(chart['case'], chart['dreal'],'rate','%s_by_dreal.png'% case)
-            print_chart(chart['case'], chart['dest'],'rate','%s_by_dest.png'% case)
-      
+    # Graficar resultados    
+    print_chart(chart['case'], {'Time':chart['time']} ,'SEGS','%s by time' % case)
+    print_chart(chart['case'], {'Real':chart['dreal'],'Estimated':chart['dest']},'RATE','%s by error' % case)
+    chart = {'case':[],'dreal':[],'dest':[],'var':[],'time':[]}
