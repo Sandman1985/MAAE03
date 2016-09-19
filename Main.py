@@ -109,24 +109,24 @@ datasets = {
 
 # Configuracion parametrica
 parms = {
-#      "DT":{
-#          "inst":DT,
-#          "parm1":[5], # max depth
-#          "parm1name":"DEPTH",
-#          "KFold":10
-#      },
+    "DT":{
+        "inst":DT,
+        "parm1":[5], # max depth
+        "parm1name":"DEPTH",
+        "KFold":10
+    },
     "NB":{
         "inst":NB,
         "parm1":[0,0.5,1], # equivalent sample data
         "parm1name":"M",
         "KFold":10
     },
-#     "KNN":{
-#         "inst":KNN,
-#         "parm1":[1,3], # k neighbors
-#         "parm1name":"K",
-#         "KFold":None # Usa LOO CV
-#     }
+    "KNN":{
+        "inst":KNN,
+        "parm1":[1,3], # k neighbors
+        "parm1name":"K",
+        "KFold":None # Usa LOO CV
+    }
 }
 
 boolean_set = ["ORIG","BOOL"]
@@ -198,10 +198,10 @@ for name,path in datasets.items():
                 _parm.append(parm['parm1'].pop(0))
                 
             parm['parm1'] = _parm 
-        
-        
-# Graficar resultados    
-print_chart(chart['case'], chart['time'],'seg','By_time.png')
-print_chart(chart['case'], chart['dreal'],'rate','By_dreal.png')
-print_chart(chart['case'], chart['dest'],'rate','By_dest.png')       
+            
+            # Graficar resultados    
+            print_chart(chart['case'], chart['time'],'seg','By_time.png')
+            print_chart(chart['case'], chart['dreal'],'rate','By_dreal.png')
+            print_chart(chart['case'], chart['dest'],'rate','By_dest.png')    
+            chart = {'case':[],'dreal':[],'dest':[],'var':[],'time':[]}
       
