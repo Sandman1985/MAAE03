@@ -131,7 +131,8 @@ parms = {
 
 boolean_set = ["ORIG","BOOL"]
 
-# Auxiliar
+
+# Auxiliares
 def format_time(s):
     # Da formato HH:MM:SS a partir de segundos
     m, s = divmod(s, 60)
@@ -158,10 +159,12 @@ def print_chart(x,y_dict,y_label,name):
     plt.xticks(x_pos, x, rotation=40, ha='right')
     plt.ylabel(y_label)
     plt.title('Result %s' % name)
-    plt.savefig("%s.png" % name.replace(" ","_"))
+    lgd = plt.legend(loc='upper left', bbox_to_anchor=(1.02, 1), borderaxespad=0)
+    plt.savefig("%s.png" % name.replace(" ","_"), bbox_extra_artists=(lgd,), bbox_inches='tight')
+
 
 # Comienzo principal
-line = '%-20s %14s %11s %10s %10s %12s %8s %8s\n' % ("CASO","DELTA_ESTIMADO","DELTA_REAL","VARIANZA","TIEMPO","#DATOS","#TRAIN","#TEST")
+line = '%-20s %14s %11s %10s %14s %8s %8s %8s\n' % ("CASO","DELTA_ESTIMADO","DELTA_REAL","VARIANZA","TIEMPO","#DATOS","#TRAIN","#TEST")
 with open('Summarize.txt','w') as f:
     f.write(line)
     
@@ -189,7 +192,7 @@ for case,parm in parms.items():
                 
                 # Imprimir resultado
                 print "\n",res
-                line = '%-20s %14.3f %11.3f %10.3f %10s %12i %8i %8i\n' % (tcase,dest,dreal,var,format_time(t_elapsed),total,ctrain,ctest)
+                line = '%-20s %14.3f %11.3f %10.3f %14s %8i %8i %8i\n' % (tcase,dest,dreal,var,format_time(t_elapsed),total,ctrain,ctest)
                 with open('Summarize.txt','a+') as f:
                     f.write(line)
                 
