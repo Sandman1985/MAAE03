@@ -156,7 +156,6 @@ def print_chart(x,y,label,name):
     plt.savefig(name)
 
 # Comienzo principal
-chart = {'case':[],'dreal':[],'dest':[],'var':[],'time':[]}
 line = '%-20s %14s %11s %10s %10s %8s %8s %8s\n' % ("CASO","DELTA_ESTIMADO","DELTA_REAL","VARIANZA","TIEMPO","#DATOS","#TRAIN","#TEST")
 with open('Summarize.txt','w') as f:
     f.write(line)
@@ -164,6 +163,7 @@ with open('Summarize.txt','w') as f:
 for name,path in datasets.items():
     for boolean in boolean_set:
         for case,parm in parms.items():
+            chart = {'case':[],'dreal':[],'dest':[],'var':[],'time':[]}
             _parm = []
             while parm['parm1']: # Prueba cada caso
                 
@@ -202,6 +202,5 @@ for name,path in datasets.items():
             # Graficar resultados    
             print_chart(chart['case'], chart['time'],'seg','%s_by_time.png' % case)
             print_chart(chart['case'], chart['dreal'],'rate','%s_by_dreal.png'% case)
-            print_chart(chart['case'], chart['dest'],'rate','%s_by_dest.png'% case)    
-            chart = {'case':[],'dreal':[],'dest':[],'var':[],'time':[]}
+            print_chart(chart['case'], chart['dest'],'rate','%s_by_dest.png'% case)
       
